@@ -1,0 +1,29 @@
+{
+  "name": "ecommerce-microservices",
+  "private": true,
+  "version": "1.0.0",
+  "description": "E-commerce microservices demo: customer, product, order, payment services + transaction worker",
+  "workspaces": [
+    "shared",
+    "customer-service",
+    "product-service",
+    "order-service",
+    "payment-service",
+    "payment-retry-worker",
+    "transaction-worker"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "seed:all": "npm run seed --workspace=customer-service && npm run seed --workspace=product-service"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.16.0",
+    "@typescript-eslint/parser": "^7.16.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.3.2",
+    "typescript": "^5.5.3"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "name": "payment-service",
+  "version": "1.0.0",
+  "description": "Simulates payment processing (demo only) and publishes transaction events to RabbitMQ.",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "test": "jest --runInBand"
+  },
+  "dependencies": {
+    "@ecommerce/shared": "*",
+    "amqplib": "^0.10.4",
+    "express": "^4.19.2",
+    "joi": "^17.13.3",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "@types/amqplib": "^0.10.5",
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.14.10",
+    "@types/supertest": "^6.0.2",
+    "@types/uuid": "^10.0.0",
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.2.2",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.5.3"
+  }
+}

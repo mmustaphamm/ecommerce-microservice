@@ -1,0 +1,52 @@
+import express, { Express } from 'express';
+import { ConfirmChannel } from 'amqplib';
+import client from 'prom-client';
+import { TOPOLOGY } from '@ecommerce/shared';
+
+/**
+ * Workers have no natural HTTP surface, but "no visibility into a worker
+ * that only talks to a queue" is exactly how dead letters go unnoticed in
+ * production. This gives us:
+ *  - GET /health: is this process actually connected to its dependencies?
+ *  - GET /metrics: a Prometheus gauge for DLQ depth, so an alert can fire
+ *    the moment messages start piling up in transaction-history-dlq,
+ *    instead of someone discovering it weeks later.
+ */
+export function createMonitoringServer(
+  channel: ConfirmChannel,
+  isReady: () => boolean,
+): Express {
+  const app = express();
+  const register = new client.Registry();
+  register.setDefaultLabels({ service: 'transaction-worker' });
+  client.collectDefaultMetrics({ register });
+
+  const dlqDepthGauge = new client.Gauge({
+    name: 'dead_letter_queue_depth',
+    help: 'Number of messages currently sitting in the transaction-history dead-letter queue',
+    registers: [register],
+  });
+
+  app.get('/health', (_req, res) => {
+    const ready = isReady();
+    res.status(ready ? 200 : 503).json({
+      service: 'transaction-worker',
+      status: ready ? 'ok' : 'not_ready',
+      timestamp: new Date().toISOString(),
+    });
+  });
+
+  app.get('/metrics', async (_req, res) => {
+    try {
+      const dlqStatus = await channel.checkQueue(TOPOLOGY.transactionEvents.deadLetterQueue);
+      dlqDepthGauge.set(dlqStatus.messageCount);
+    } catch {
+      // If the check itself fails, we simply don't update the gauge this
+      // scrape - better than crashing the metrics endpoint.
+    }
+    res.set('Content-Type', register.contentType);
+    res.end(await register.metrics());
+  });
+
+  return app;
+}

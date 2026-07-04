@@ -1,0 +1,157 @@
+version: '3.9'
+
+# INTERNAL_API_KEY is a shared secret used by internalAuthMiddleware to
+# protect service-to-service-only endpoints (stock reserve/release,
+# payment initiation, order payment-status updates) from being called
+# directly by end users. Change this in any real deployment.
+x-internal-api-key: &internal-api-key "dev-only-shared-secret-change-me"
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: ecommerce-mongo
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: ecommerce-rabbitmq
+    ports:
+      - '5672:5672' # AMQP protocol
+      - '15672:15672' # Management UI - http://localhost:15672 (guest/guest)
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  customer-service:
+    build:
+      context: .
+      dockerfile: customer-service/Dockerfile
+    container_name: customer-service
+    ports:
+      - '3001:3001'
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      MONGO_URI: mongodb://mongo:27017/customer_db
+      LOG_LEVEL: info
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  product-service:
+    build:
+      context: .
+      dockerfile: product-service/Dockerfile
+    container_name: product-service
+    ports:
+      - '3002:3002'
+    environment:
+      NODE_ENV: production
+      PORT: 3002
+      MONGO_URI: mongodb://mongo:27017/product_db
+      INTERNAL_API_KEY: *internal-api-key
+      LOG_LEVEL: info
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  order-service:
+    build:
+      context: .
+      dockerfile: order-service/Dockerfile
+    container_name: order-service
+    ports:
+      - '3003:3003'
+    environment:
+      NODE_ENV: production
+      PORT: 3003
+      MONGO_URI: mongodb://mongo:27017/order_db
+      RABBITMQ_URL: amqp://rabbitmq:5672
+      PAYMENT_SERVICE_URL: http://payment-service:3004
+      PRODUCT_SERVICE_URL: http://product-service:3002
+      CUSTOMER_SERVICE_URL: http://customer-service:3001
+      INTERNAL_API_KEY: *internal-api-key
+      LOG_LEVEL: info
+    depends_on:
+      mongo:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      customer-service:
+        condition: service_started
+      product-service:
+        condition: service_started
+      payment-service:
+        condition: service_started
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: payment-service/Dockerfile
+    container_name: payment-service
+    ports:
+      - '3004:3004'
+    environment:
+      NODE_ENV: production
+      PORT: 3004
+      RABBITMQ_URL: amqp://rabbitmq:5672
+      INTERNAL_API_KEY: *internal-api-key
+      LOG_LEVEL: info
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  payment-retry-worker:
+    build:
+      context: .
+      dockerfile: payment-retry-worker/Dockerfile
+    container_name: payment-retry-worker
+    ports:
+      - '3006:3006' # /health and /metrics only - no business HTTP endpoints
+    environment:
+      NODE_ENV: production
+      PORT: 3006
+      RABBITMQ_URL: amqp://rabbitmq:5672
+      PAYMENT_SERVICE_URL: http://payment-service:3004
+      ORDER_SERVICE_URL: http://order-service:3003
+      INTERNAL_API_KEY: *internal-api-key
+      LOG_LEVEL: info
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      payment-service:
+        condition: service_started
+      order-service:
+        condition: service_started
+
+  transaction-worker:
+    build:
+      context: .
+      dockerfile: transaction-worker/Dockerfile
+    container_name: transaction-worker
+    ports:
+      - '3005:3005' # /health and /metrics only - no business HTTP endpoints
+    environment:
+      NODE_ENV: production
+      PORT: 3005
+      MONGO_URI: mongodb://mongo:27017/payment_db
+      RABBITMQ_URL: amqp://rabbitmq:5672
+      LOG_LEVEL: info
+    depends_on:
+      mongo:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+volumes:
+  mongo-data:
