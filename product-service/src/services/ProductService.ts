@@ -1,6 +1,6 @@
 import { IProductRepository, PaginatedResult } from '../repositories/IProductRepository';
 import { ProductAttributes } from '../models/Product';
-import { NotFoundError, ConflictError } from '@ecommerce/shared';
+import { NotFoundError, ConflictError } from '@ecommerce/shared/src';
 
 export class ProductService {
   constructor(private readonly productRepo: IProductRepository) {}

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { ProductService } from '../services/ProductService';
 import { ProductAttributes } from '../models/Product';
-import { ApiSuccessResponse } from '@ecommerce/shared';
+import { ApiSuccessResponse } from '@ecommerce/shared/src';
 import { PaginatedResult } from '../repositories/IProductRepository';
 
 interface StockMutationBody {

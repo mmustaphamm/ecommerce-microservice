@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { CustomerService } from '../services/CustomerService';
 import { CustomerAttributes } from '../models/Customer';
-import { ApiSuccessResponse } from '@ecommerce/shared';
+import { ApiSuccessResponse } from '@ecommerce/shared/src';
 
 /**
  * Controllers only handle HTTP concerns: parsing the request, calling the

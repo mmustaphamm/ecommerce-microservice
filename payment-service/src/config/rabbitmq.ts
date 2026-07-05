@@ -4,7 +4,7 @@ import {
   Publisher,
   assertTransactionTopology,
   assertPaymentRetryTopology,
-} from '@ecommerce/shared';
+} from '@ecommerce/shared/src';
 import { env } from './env';
 
 let connection: RabbitMQConnection | null = null;

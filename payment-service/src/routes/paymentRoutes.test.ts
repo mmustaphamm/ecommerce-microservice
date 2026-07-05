@@ -1,8 +1,8 @@
 import request from 'supertest';
-import { createLogger } from '@ecommerce/shared';
+import { createLogger } from '@ecommerce/shared/src';
 import { createApp } from '../app';
 import { ITransactionEventPublisher } from '../rabbitmq/ITransactionEventPublisher';
-import { TransactionCreatedEvent } from '@ecommerce/shared';
+import { TransactionCreatedEvent } from '@ecommerce/shared/src';
 
 class FakeTransactionEventPublisher implements ITransactionEventPublisher {
   public publishedEvents: TransactionCreatedEvent[] = [];

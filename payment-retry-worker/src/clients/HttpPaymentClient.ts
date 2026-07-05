@@ -1,4 +1,4 @@
-import { HttpClient, ApiSuccessResponse, InitiatePaymentRequest, InitiatePaymentResponse } from '@ecommerce/shared';
+import { HttpClient, ApiSuccessResponse, InitiatePaymentRequest, InitiatePaymentResponse } from '@ecommerce/shared/src';
 import { IPaymentClient } from './IPaymentClient';
 
 export class HttpPaymentClient implements IPaymentClient {

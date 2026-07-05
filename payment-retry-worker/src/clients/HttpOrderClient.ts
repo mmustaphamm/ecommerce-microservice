@@ -1,4 +1,4 @@
-import { HttpClient, UpdateOrderPaymentStatusRequest } from '@ecommerce/shared';
+import { HttpClient, UpdateOrderPaymentStatusRequest } from '@ecommerce/shared/src';
 import { IOrderClient } from './IOrderClient';
 
 export class HttpOrderClient implements IOrderClient {

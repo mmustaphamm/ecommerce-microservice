@@ -5,7 +5,7 @@ import {
   Publisher,
   assertPaymentRetryTopology,
   registerGracefulShutdown,
-} from '@ecommerce/shared';
+} from '@ecommerce/shared/src';
 import { env } from './config/env';
 import { connectDatabase } from './config/database';
 import { createApp } from './app';

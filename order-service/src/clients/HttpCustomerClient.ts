@@ -1,4 +1,4 @@
-import { HttpClient, ApiSuccessResponse } from '@ecommerce/shared';
+import { HttpClient, ApiSuccessResponse } from '@ecommerce/shared/src';
 import { ICustomerClient, CustomerInfo } from './ICustomerClient';
 
 export class HttpCustomerClient implements ICustomerClient {

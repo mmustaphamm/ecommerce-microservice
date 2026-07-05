@@ -8,7 +8,7 @@ import {
   registerGracefulShutdown,
   TOPOLOGY,
   PaymentRetryRequestedEvent,
-} from '@ecommerce/shared';
+} from '@ecommerce/shared/src';
 import { env } from './config/env';
 import { HttpPaymentClient } from './clients/HttpPaymentClient';
 import { HttpOrderClient } from './clients/HttpOrderClient';

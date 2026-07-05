@@ -1,7 +1,7 @@
 import { CustomerService } from './CustomerService';
 import { ICustomerRepository } from '../repositories/ICustomerRepository';
 import { CustomerAttributes } from '../models/Customer';
-import { NotFoundError } from '@ecommerce/shared';
+import { NotFoundError } from '@ecommerce/shared/src';
 
 /**
  * Because CustomerService depends on the ICustomerRepository interface

@@ -4,6 +4,7 @@ interface Env {
   NODE_ENV: string;
   PORT: number;
   MONGO_URI: string;
+  INTERNAL_API_KEY: string;
   LOG_LEVEL: string;
 }
 
@@ -11,6 +12,7 @@ const schema = Joi.object({
   NODE_ENV: Joi.string().valid('development', 'production', 'test').default('development'),
   PORT: Joi.number().default(3001),
   MONGO_URI: Joi.string().uri().required(),
+  INTERNAL_API_KEY: Joi.string().min(16).required(),
   LOG_LEVEL: Joi.string().default('info'),
 }).unknown(true);
 

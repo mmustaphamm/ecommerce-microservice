@@ -5,8 +5,9 @@ import {
   CreateOrderRequest,
   CreateOrderResponse,
   NotFoundError,
+  OrderStatusResponse,
   UpdateOrderPaymentStatusRequest,
-} from '@ecommerce/shared';
+} from '@ecommerce/shared/src';
 
 const IDEMPOTENCY_KEY_HEADER = 'idempotency-key';
 
@@ -24,6 +25,21 @@ export class OrderController {
       data: order,
     };
     res.status(201).json(body);
+  };
+
+  getOrderStatus = async (req: Request, res: Response): Promise<void> => {
+    const { orderId } = req.params;
+
+    const order = await this.orderService.getOrderStatus(orderId);
+    if (!order) {
+      throw new NotFoundError('Order', orderId);
+    }
+
+    const body: ApiSuccessResponse<OrderStatusResponse> = {
+      success: true,
+      data: order,
+    };
+    res.status(200).json(body);
   };
 
   /**

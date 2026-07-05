@@ -43,6 +43,7 @@ services:
       NODE_ENV: production
       PORT: 3001
       MONGO_URI: mongodb://mongo:27017/customer_db
+      INTERNAL_API_KEY: *internal-api-key
       LOG_LEVEL: info
     depends_on:
       mongo:

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { PaymentController } from '../controllers/PaymentController';
-import { validateRequest, asyncHandler, internalAuthMiddleware } from '@ecommerce/shared';
+import { validateRequest, asyncHandler, internalAuthMiddleware } from '@ecommerce/shared/src';
 import { initiatePaymentSchema } from '../middlewares/schemas';
 import { env } from '../config/env';
 

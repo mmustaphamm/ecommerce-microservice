@@ -1,4 +1,4 @@
-import { HttpClient, ApiSuccessResponse, UpstreamServiceError, ConflictError } from '@ecommerce/shared';
+import { HttpClient, ApiSuccessResponse, UpstreamServiceError, ConflictError } from '@ecommerce/shared/src';
 import { IProductClient, ProductInfo } from './IProductClient';
 
 interface ErrorResponseBody {

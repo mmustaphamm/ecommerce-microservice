@@ -10,7 +10,7 @@ import {
   Publisher,
   InitiatePaymentResponse,
   OrderStatus,
-} from '@ecommerce/shared';
+} from '@ecommerce/shared/src';
 
 /**
  * Fake repository that mimics the real Mongo implementation closely enough
@@ -137,7 +137,7 @@ describe('OrderService', () => {
     );
   });
 
-  it('still saves the order as pending and does not throw when Payment Service is unreachable', async () => {
+  it('keeps the order as payment_pending and does not throw when Payment Service is unreachable', async () => {
     const paymentClient: IPaymentClient = {
       initiatePayment: jest
         .fn()
@@ -153,11 +153,12 @@ describe('OrderService', () => {
       amount: 19.99,
     });
 
-    // The customer still gets a clean pending order - never punished for a
+    // The customer still gets a clean payment_pending order - never punished for a
     // downstream outage they have no control over. Crucially, the order was
     // already durably saved BEFORE payment was attempted (consistency fix).
-    expect(result.orderStatus).toBe('pending');
+    expect(result.orderStatus).toBe('payment_pending');
     expect(orderRepo.saved[0].paymentInitiated).toBe(false);
+    expect(orderRepo.saved[0].orderStatus).toBe('payment_pending');
     expect(orderRepo.saved).toHaveLength(1);
 
     // A reconciliation event (with attempts: 1) was published via publisher
@@ -236,7 +237,7 @@ describe('OrderService', () => {
       customerId: 'cust-0001',
       productId: 'prod-0001',
       amount: 19.99,
-      orderStatus: 'pending',
+      orderStatus: 'payment_pending',
       paymentInitiated: false,
       idempotencyKey: 'race-key',
       createdAt: new Date(),
@@ -275,5 +276,32 @@ describe('OrderService', () => {
     await expect(
       service.createOrder({ customerId: 'cust-0001', productId: 'prod-0001', amount: 19.99 }),
     ).rejects.toThrow('totally unexpected bug');
+  });
+
+  it('returns the current order status when the order exists', async () => {
+    const paymentClient: IPaymentClient = {
+      initiatePayment: jest.fn().mockResolvedValue({ paymentId: 'p1', orderId: 'o1', status: 'accepted' }),
+    };
+    const publisher = { publish: jest.fn() } as unknown as Publisher;
+    const { service } = makeService(paymentClient, publisher);
+
+    const created = await service.createOrder({ customerId: 'cust-0001', productId: 'prod-0001' });
+    const status = await service.getOrderStatus(created.orderId);
+
+    expect(status).toMatchObject({
+      orderId: created.orderId,
+      customerId: 'cust-0001',
+      productId: 'prod-0001',
+      orderStatus: 'confirmed',
+      paymentInitiated: true,
+    });
+  });
+
+  it('returns null when fetching status for a missing order', async () => {
+    const paymentClient: IPaymentClient = { initiatePayment: jest.fn() };
+    const publisher = { publish: jest.fn() } as unknown as Publisher;
+    const { service } = makeService(paymentClient, publisher);
+
+    await expect(service.getOrderStatus('missing-order-id')).resolves.toBeNull();
   });
 });

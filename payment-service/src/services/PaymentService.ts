@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import { InitiatePaymentRequest, InitiatePaymentResponse, TransactionCreatedEvent } from '@ecommerce/shared';
+import { InitiatePaymentRequest, InitiatePaymentResponse, TransactionCreatedEvent } from '@ecommerce/shared/src';
 import { ITransactionEventPublisher } from '../rabbitmq/ITransactionEventPublisher';
 
 /**

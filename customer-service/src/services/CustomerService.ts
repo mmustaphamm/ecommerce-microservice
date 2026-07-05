@@ -1,6 +1,6 @@
 import { ICustomerRepository } from '../repositories/ICustomerRepository';
 import { CustomerAttributes } from '../models/Customer';
-import { NotFoundError } from '@ecommerce/shared';
+import { NotFoundError } from '@ecommerce/shared/src';
 
 /**
  * Business logic for customers. Depends on the repository interface only

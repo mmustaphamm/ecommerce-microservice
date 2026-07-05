@@ -12,7 +12,7 @@ const schema = Joi.object({
   NODE_ENV: Joi.string().valid('development', 'production', 'test').default('development'),
   PORT: Joi.number().default(3002),
   MONGO_URI: Joi.string().uri().required(),
-  INTERNAL_API_KEY: Joi.string().min(8).required(),
+  INTERNAL_API_KEY: Joi.string().min(16).required(),
   LOG_LEVEL: Joi.string().default('info'),
 }).unknown(true);
 

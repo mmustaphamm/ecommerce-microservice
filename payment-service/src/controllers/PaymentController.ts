@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { PaymentService } from '../services/PaymentService';
-import { ApiSuccessResponse, InitiatePaymentRequest, InitiatePaymentResponse } from '@ecommerce/shared';
+import { ApiSuccessResponse, InitiatePaymentRequest, InitiatePaymentResponse } from '@ecommerce/shared/src';
 
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}

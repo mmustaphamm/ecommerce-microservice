@@ -1,6 +1,6 @@
 import { PaymentService } from './PaymentService';
 import { ITransactionEventPublisher } from '../rabbitmq/ITransactionEventPublisher';
-import { InitiatePaymentRequest, TransactionCreatedEvent } from '@ecommerce/shared';
+import { InitiatePaymentRequest, TransactionCreatedEvent } from '@ecommerce/shared/src';
 
 class FakeTransactionEventPublisher implements ITransactionEventPublisher {
   public publishedEvents: TransactionCreatedEvent[] = [];

@@ -4,7 +4,7 @@ import {
   Publisher,
   TOPOLOGY,
   PaymentRetryRequestedEvent,
-} from '@ecommerce/shared';
+} from '@ecommerce/shared/src';
 import { IPaymentClient } from './clients/IPaymentClient';
 import { IOrderClient } from './clients/IOrderClient';
 
@@ -79,7 +79,7 @@ export class PaymentRetryProcessor {
 
       this.logger.error(
         { orderId: event.orderId, attempts: event.attempts, err },
-        'Payment retry attempts exhausted - marking order as permanently failed',
+        'Payment retry attempts exhausted - marking payment_pending order as permanently failed',
       );
 
       try {

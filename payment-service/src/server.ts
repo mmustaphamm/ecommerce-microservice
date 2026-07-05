@@ -1,4 +1,4 @@
-import { createLogger, registerGracefulShutdown } from '@ecommerce/shared';
+import { createLogger, registerGracefulShutdown } from '@ecommerce/shared/src';
 import { env } from './config/env';
 import { connectRabbitMQ, getPublisher, isRabbitMQReady, closeRabbitMQ } from './config/rabbitmq';
 import { RabbitMQTransactionPublisher } from './rabbitmq/RabbitMQTransactionPublisher';

@@ -1,4 +1,4 @@
-import { Publisher, TransactionCreatedEvent, TOPOLOGY } from '@ecommerce/shared';
+import { Publisher, TransactionCreatedEvent, TOPOLOGY } from '@ecommerce/shared/src';
 import { ITransactionEventPublisher } from './ITransactionEventPublisher';
 
 export class RabbitMQTransactionPublisher implements ITransactionEventPublisher {

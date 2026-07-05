@@ -5,7 +5,12 @@
  * it's used, rather than a silent runtime mismatch between services.
  */
 
-export type OrderStatus = 'pending' | 'confirmed' | 'failed';
+export type OrderStatus =
+  | 'pending'
+  | 'stock_reserved'
+  | 'payment_pending'
+  | 'confirmed'
+  | 'failed';
 
 /**
  * Body the customer sends to POST /orders on the Order Service.
@@ -29,6 +34,15 @@ export interface CreateOrderResponse {
   orderId: string;
   productId: string;
   orderStatus: OrderStatus;
+}
+
+/** Response for checking an existing order's current lifecycle state. */
+export interface OrderStatusResponse {
+  orderId: string;
+  customerId: string;
+  productId: string;
+  orderStatus: OrderStatus;
+  paymentInitiated: boolean;
 }
 
 /** Body the Order Service sends to POST /payments on the Payment Service. */

@@ -1,7 +1,7 @@
 import { PaymentRetryProcessor } from './PaymentRetryProcessor';
 import { IPaymentClient } from './clients/IPaymentClient';
 import { IOrderClient } from './clients/IOrderClient';
-import { UpstreamServiceError, Publisher, PaymentRetryRequestedEvent, TOPOLOGY } from '@ecommerce/shared';
+import { UpstreamServiceError, Publisher, PaymentRetryRequestedEvent, TOPOLOGY } from '@ecommerce/shared/src';
 
 const baseEvent: PaymentRetryRequestedEvent = {
   orderId: 'order-1',
@@ -49,7 +49,7 @@ describe('PaymentRetryProcessor', () => {
       TOPOLOGY.paymentRetry.delayQueue,
       expect.objectContaining({ orderId: 'order-1', attempts: 2 }),
     );
-    // Order state is untouched while retries remain - still pending.
+    // Order state is untouched while retries remain - still payment_pending.
     expect(orderClient.updatePaymentStatus).not.toHaveBeenCalled();
   });
 

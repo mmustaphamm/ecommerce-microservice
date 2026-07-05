@@ -1,9 +1,11 @@
 import request from 'supertest';
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { createLogger } from '@ecommerce/shared';
+import { createLogger } from '@ecommerce/shared/src';
 import { createApp } from '../app';
 import { CustomerModel } from '../models/Customer';
+
+const internalApiKey = process.env.INTERNAL_API_KEY as string;
 
 /**
  * Integration test: exercises the real Express app (routing, validation
@@ -37,7 +39,9 @@ describe('GET /customers/:customerId', () => {
       email: 'john.doe@example.com',
     });
 
-    const response = await request(app).get('/customers/cust-0001');
+    const response = await request(app)
+      .get('/customers/cust-0001')
+      .set('x-internal-api-key', internalApiKey);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);
@@ -46,11 +50,30 @@ describe('GET /customers/:customerId', () => {
   });
 
   it('returns 404 when the customer does not exist', async () => {
-    const response = await request(app).get('/customers/does-not-exist');
+    const response = await request(app)
+      .get('/customers/cust-9999')
+      .set('x-internal-api-key', internalApiKey);
 
     expect(response.status).toBe(404);
     expect(response.body.success).toBe(false);
     expect(response.body.error.code).toBe('NOT_FOUND');
+  });
+
+  it('returns 403 without the internal API key', async () => {
+    const response = await request(app).get('/customers/cust-0001');
+
+    expect(response.status).toBe(403);
+    expect(response.body.success).toBe(false);
+    expect(response.body.error.code).toBe('FORBIDDEN');
+  });
+
+  it('returns 400 when customerId has an invalid format', async () => {
+    const response = await request(app)
+      .get('/customers/does-not-exist')
+      .set('x-internal-api-key', internalApiKey);
+
+    expect(response.status).toBe(400);
+    expect(response.body.success).toBe(false);
   });
 
   it('returns 200 on the health check', async () => {

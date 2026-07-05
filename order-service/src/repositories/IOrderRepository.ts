@@ -1,5 +1,5 @@
 import { OrderAttributes } from '../models/Order';
-import { OrderStatus } from '@ecommerce/shared';
+import { OrderStatus } from '@ecommerce/shared/src';
 
 export interface IOrderRepository {
   create(order: OrderAttributes): Promise<OrderAttributes>;

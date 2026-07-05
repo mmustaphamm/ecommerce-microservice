@@ -1,4 +1,4 @@
-import { InitiatePaymentRequest, InitiatePaymentResponse } from '@ecommerce/shared';
+import { InitiatePaymentRequest, InitiatePaymentResponse } from '@ecommerce/shared/src';
 
 /**
  * Abstraction over calling the Payment Service. Kept as an interface so

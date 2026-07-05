@@ -6,9 +6,10 @@ import {
   TOPOLOGY,
   CreateOrderRequest,
   CreateOrderResponse,
+  OrderStatusResponse,
   PaymentRetryRequestedEvent,
   OrderStatus,
-} from '@ecommerce/shared';
+} from '@ecommerce/shared/src';
 import { IOrderRepository } from '../repositories/IOrderRepository';
 import { IPaymentClient } from '../clients/IPaymentClient';
 import { IProductClient } from '../clients/IProductClient';
@@ -34,7 +35,8 @@ const MONGO_DUPLICATE_KEY_CODE = 11000;
  *    retries AND circuit breaker are exhausted) -> this is an
  *    *infrastructure* failure, not a bad request. We do NOT fail the
  *    customer's order for this. The order (already durably saved as
- *    `pending` BEFORE we attempted payment - see below) stays pending with
+ *    `payment_pending` BEFORE we attempted payment - see below) stays in
+ *    that state with
  *    `paymentInitiated: false`, and a `payment.retry.requested` event is
  *    published for the retry worker to reconcile later.
  *
@@ -44,9 +46,10 @@ const MONGO_DUPLICATE_KEY_CODE = 11000;
  * order was never persisted (e.g. a DB blip right after payment). Now we:
  *   1. validate customer + product exist
  *   2. atomically reserve stock (fails outright, cleanly, if insufficient)
- *   3. save the order as `pending` FIRST
- *   4. only then attempt payment
- *   5. update the already-saved order's payment fields based on the outcome
+ *   3. save the order as `stock_reserved` FIRST
+ *   4. move it to `payment_pending`
+ *   5. only then attempt payment
+ *   6. update the already-saved order's payment fields based on the outcome
  * This guarantees an order record exists before money ever moves, and a
  * step-4/5 failure never leaves a "phantom" payment with no order behind it.
  */
@@ -110,7 +113,7 @@ export class OrderService {
         customerId: request.customerId,
         productId: request.productId,
         amount: authoritativeAmount,
-        orderStatus: 'pending',
+        orderStatus: 'stock_reserved',
         paymentInitiated: false,
         idempotencyKey,
         createdAt: new Date(),
@@ -139,7 +142,15 @@ export class OrderService {
       throw err;
     }
 
-    // Only now, with the order durably persisted as pending, do we attempt
+    const paymentPending = await this.orderRepo.updatePaymentStatus(orderId, {
+      paymentInitiated: false,
+      orderStatus: 'payment_pending',
+    });
+    if (paymentPending) {
+      saved = paymentPending;
+    }
+
+    // Only now, with the order durably persisted as payment_pending, do we attempt
     // payment. A failure past this point can never leave an "orphaned"
     // payment with no corresponding order.
     const paymentInitiated = await this.tryInitiatePayment(
@@ -161,8 +172,8 @@ export class OrderService {
         saved = updated;
       }
     }
-    // If payment was not initiated, the order already sits as pending /
-    // paymentInitiated: false exactly as saved above - nothing further to
+    // If payment was not initiated, the order already sits as payment_pending /
+    // paymentInitiated: false - nothing further to
     // update here. The retry worker will call our internal
     // PATCH /orders/:orderId/payment-status endpoint once it resolves.
 
@@ -259,6 +270,19 @@ export class OrderService {
     const updated = await this.orderRepo.updatePaymentStatus(orderId, update);
     if (!updated) return null;
     return this.toResponse(updated);
+  }
+
+  async getOrderStatus(orderId: string): Promise<OrderStatusResponse | null> {
+    const order = await this.orderRepo.findByOrderId(orderId);
+    if (!order) return null;
+
+    return {
+      orderId: order.orderId,
+      customerId: order.customerId,
+      productId: order.productId,
+      orderStatus: order.orderStatus,
+      paymentInitiated: order.paymentInitiated,
+    };
   }
 
   private toResponse(order: OrderAttributes): CreateOrderResponse {

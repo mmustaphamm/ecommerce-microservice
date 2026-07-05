@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { createLogger } from '@ecommerce/shared';
+import { createLogger } from '@ecommerce/shared/src';
 import { env } from '../config/env';
 import { ProductModel } from '../models/Product';
 

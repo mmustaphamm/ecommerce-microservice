@@ -1,4 +1,4 @@
-import { TransactionCreatedEvent } from '@ecommerce/shared';
+import { TransactionCreatedEvent } from '@ecommerce/shared/src';
 
 /**
  * Abstraction over "publish a transaction event somewhere". PaymentService

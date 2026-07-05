@@ -1,7 +1,7 @@
 import request from 'supertest';
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { createLogger } from '@ecommerce/shared';
+import { createLogger } from '@ecommerce/shared/src';
 import { createApp } from '../app';
 import { ProductModel } from '../models/Product';
 
@@ -33,8 +33,13 @@ describe('Product routes', () => {
   });
 
   it('GET /products/:productId returns 404 when not found', async () => {
-    const response = await request(app).get('/products/missing');
+    const response = await request(app).get('/products/prod-9999');
     expect(response.status).toBe(404);
+  });
+
+  it('GET /products/:productId returns 400 for invalid productId format', async () => {
+    const response = await request(app).get('/products/missing');
+    expect(response.status).toBe(400);
   });
 
   it('GET /products returns paginated products', async () => {

@@ -1,6 +1,6 @@
 import { IOrderRepository } from './IOrderRepository';
 import { OrderModel, OrderAttributes } from '../models/Order';
-import { OrderStatus } from '@ecommerce/shared';
+import { OrderStatus } from '@ecommerce/shared/src';
 
 export class MongoOrderRepository implements IOrderRepository {
   async create(order: OrderAttributes): Promise<OrderAttributes> {

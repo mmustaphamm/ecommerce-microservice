@@ -1,5 +1,5 @@
 import { Schema, model, Document } from 'mongoose';
-import { OrderStatus } from '@ecommerce/shared';
+import { OrderStatus } from '@ecommerce/shared/src';
 
 export interface OrderAttributes {
   orderId: string;
@@ -32,7 +32,7 @@ const orderSchema = new Schema<OrderDocument>({
   amount: { type: Number, required: true, min: 0 },
   orderStatus: {
     type: String,
-    enum: ['pending', 'confirmed', 'failed'],
+    enum: ['pending', 'stock_reserved', 'payment_pending', 'confirmed', 'failed'],
     default: 'pending',
     required: true,
   },

@@ -12,6 +12,7 @@
   "dependencies": {
     "@ecommerce/shared": "*",
     "express": "^4.19.2",
+    "helmet": "^8.2.0",
     "mongoose": "^8.5.1",
     "prom-client": "^15.1.3"
   },

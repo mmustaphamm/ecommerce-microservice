@@ -14,5 +14,7 @@ export const orderIdParamsSchema = Joi.object({
 
 export const updatePaymentStatusSchema = Joi.object({
   paymentInitiated: Joi.boolean().required(),
-  orderStatus: Joi.string().valid('pending', 'confirmed', 'failed').required(),
+  orderStatus: Joi.string()
+    .valid('pending', 'stock_reserved', 'payment_pending', 'confirmed', 'failed')
+    .required(),
 });

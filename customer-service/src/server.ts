@@ -1,4 +1,5 @@
-import { createLogger } from '@ecommerce/shared';
+import mongoose from 'mongoose';
+import { createLogger, registerGracefulShutdown } from '@ecommerce/shared/src';
 import { env } from './config/env';
 import { connectDatabase } from './config/database';
 import { createApp } from './app';
@@ -10,8 +11,16 @@ async function bootstrap(): Promise<void> {
 
   const app = createApp(logger);
 
-  app.listen(env.PORT, () => {
+  const server = app.listen(env.PORT, () => {
     logger.info(`customer-service listening on port ${env.PORT}`);
+  });
+
+  registerGracefulShutdown({
+    httpServer: server,
+    logger,
+    onShutdown: async () => {
+      await mongoose.disconnect();
+    },
   });
 }
 

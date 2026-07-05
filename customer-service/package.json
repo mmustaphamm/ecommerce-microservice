@@ -13,6 +13,7 @@
   "dependencies": {
     "@ecommerce/shared": "*",
     "express": "^4.19.2",
+    "helmet": "^8.2.0",
     "joi": "^17.13.3",
     "mongoose": "^8.5.1"
   },
