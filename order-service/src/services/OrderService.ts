@@ -79,18 +79,9 @@ export class OrderService {
       }
     }
 
-    // Validate referenced entities exist. Letting these propagate as-is
-    // (404/502/409 from the shared HttpClient / product client) is correct:
-    // an order for a nonexistent customer or product, or one we can't
-    // fulfill, should never be created.
     await this.customerClient.getCustomer(request.customerId, correlationId);
     const product = await this.productClient.getProduct(request.productId, correlationId);
 
-    // SECURITY / TRUST BOUNDARY: never trust a client-supplied charge
-    // amount. The authoritative price always comes from Product Service,
-    // which we just fetched. If the client sent a different `amount`, we
-    // log it (useful for catching buggy or malicious clients) but always
-    // charge and persist the server-derived price.
     const authoritativeAmount = product.price;
     if (request.amount !== undefined && Math.abs(request.amount - authoritativeAmount) > 0.001) {
       this.logger.warn(
@@ -99,9 +90,6 @@ export class OrderService {
       );
     }
 
-    // Atomically reserve stock before creating the order or touching
-    // payment. If this throws (ConflictError), nothing else has happened
-    // yet, so there is nothing to compensate/roll back.
     await this.productClient.reserveStock(request.productId, ORDER_QUANTITY, correlationId);
 
     const orderId = uuidv4();
@@ -150,9 +138,6 @@ export class OrderService {
       saved = paymentPending;
     }
 
-    // Only now, with the order durably persisted as payment_pending, do we attempt
-    // payment. A failure past this point can never leave an "orphaned"
-    // payment with no corresponding order.
     const paymentInitiated = await this.tryInitiatePayment(
       {
         customerId: request.customerId,
@@ -172,20 +157,11 @@ export class OrderService {
         saved = updated;
       }
     }
-    // If payment was not initiated, the order already sits as payment_pending /
-    // paymentInitiated: false - nothing further to
-    // update here. The retry worker will call our internal
-    // PATCH /orders/:orderId/payment-status endpoint once it resolves.
 
     return this.toResponse(saved);
   }
 
-  /**
-   * Attempts to initiate payment. Returns whether it succeeded, and never
-   * throws for infrastructure-type failures - a payment-service outage must
-   * never prevent the (already-saved) order from being returned to the
-   * customer.
-   */
+  
   private async tryInitiatePayment(
     payload: { customerId: string; productId: string; orderId: string; amount: number },
     correlationId?: string,

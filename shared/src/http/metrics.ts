@@ -37,5 +37,5 @@ export function createMetrics(serviceName: string) {
     res.end(await register.metrics());
   }
 
-  return { metricsMiddleware, metricsHandler, register };
+  return {  metricsMiddleware, metricsHandler, register };
 }
