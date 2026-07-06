@@ -12,9 +12,9 @@ describe('TransactionProcessor', () => {
 
     const event: TransactionCreatedEvent = {
       transactionId: 'txn-1',
-      customerId: 'cust-0001',
+      customerId: '001',
       orderId: 'order-1',
-      productId: 'prod-0001',
+      productId: '001',
       amount: 19.99,
       createdAt: '2026-07-03T10:00:00.000Z',
     };
@@ -24,9 +24,9 @@ describe('TransactionProcessor', () => {
     expect(saveIfNotExists).toHaveBeenCalledWith(
       expect.objectContaining({
         transactionId: 'txn-1',
-        customerId: 'cust-0001',
+        customerId: '001',
         orderId: 'order-1',
-        productId: 'prod-0001',
+        productId: '001',
         amount: 19.99,
       }),
     );
@@ -41,9 +41,9 @@ describe('TransactionProcessor', () => {
 
     const event: TransactionCreatedEvent = {
       transactionId: 'txn-2',
-      customerId: 'cust-0001',
+      customerId: '001',
       orderId: 'order-2',
-      productId: 'prod-0001',
+      productId: '001',
       amount: 5,
       createdAt: new Date().toISOString(),
     };

@@ -27,14 +27,14 @@ describe('CustomerService', () => {
 
   it('returns the customer when found', async () => {
     const customer: CustomerAttributes = {
-      customerId: 'cust-0001',
+      customerId: '001',
       name: 'John Doe',
       email: 'john.doe@example.com',
       createdAt: new Date(),
     };
     await repo.create(customer);
 
-    const result = await service.getCustomerById('cust-0001');
+    const result = await service.getCustomerById('001');
 
     expect(result).toEqual(customer);
   });
@@ -45,7 +45,7 @@ describe('CustomerService', () => {
 
   it('persists a newly created customer', async () => {
     const customer: CustomerAttributes = {
-      customerId: 'cust-0002',
+      customerId: '002',
       name: 'Jane Smith',
       email: 'jane.smith@example.com',
       createdAt: new Date(),
@@ -53,6 +53,6 @@ describe('CustomerService', () => {
 
     await service.createCustomer(customer);
 
-    await expect(service.getCustomerById('cust-0002')).resolves.toEqual(customer);
+    await expect(service.getCustomerById('002')).resolves.toEqual(customer);
   });
 });

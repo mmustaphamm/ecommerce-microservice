@@ -5,8 +5,8 @@ import { UpstreamServiceError, Publisher, PaymentRetryRequestedEvent, TOPOLOGY }
 
 const baseEvent: PaymentRetryRequestedEvent = {
   orderId: 'order-1',
-  customerId: 'cust-0001',
-  productId: 'prod-0001',
+  customerId: '001',
+  productId: '001',
   amount: 19.99,
   requestedAt: new Date().toISOString(),
   attempts: 1,

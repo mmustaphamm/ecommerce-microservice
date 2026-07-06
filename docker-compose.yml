@@ -4,7 +4,7 @@ version: '3.9'
 # protect service-to-service-only endpoints (stock reserve/release,
 # payment initiation, order payment-status updates) from being called
 # directly by end users. Change this in any real deployment.
-x-internal-api-key: &internal-api-key "dev-only-shared-secret-change-me"
+x-internal-api-key: &internal-api-key "x456ythjenRQWP90hfhrnsagbrgfh"
 
 services:
   mongo:

@@ -34,24 +34,24 @@ describe('GET /customers/:customerId', () => {
 
   it('returns 200 and the customer when found', async () => {
     await CustomerModel.create({
-      customerId: 'cust-0001',
+      customerId: '001',
       name: 'John Doe',
       email: 'john.doe@example.com',
     });
 
     const response = await request(app)
-      .get('/customers/cust-0001')
+      .get('/customers/001')
       .set('x-internal-api-key', internalApiKey);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);
-    expect(response.body.data.customerId).toBe('cust-0001');
+    expect(response.body.data.customerId).toBe('001');
     expect(response.body.data.email).toBe('john.doe@example.com');
   });
 
   it('returns 404 when the customer does not exist', async () => {
     const response = await request(app)
-      .get('/customers/cust-9999')
+      .get('/customers/999')
       .set('x-internal-api-key', internalApiKey);
 
     expect(response.status).toBe(404);
@@ -60,7 +60,7 @@ describe('GET /customers/:customerId', () => {
   });
 
   it('returns 403 without the internal API key', async () => {
-    const response = await request(app).get('/customers/cust-0001');
+    const response = await request(app).get('/customers/001');
 
     expect(response.status).toBe(403);
     expect(response.body.success).toBe(false);

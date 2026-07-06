@@ -74,14 +74,14 @@ RabbitMQ management UI: http://localhost:15672 (guest/guest)
 curl -X POST http://localhost:3003/orders \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: $(uuidgen)" \
-  -d '{"customerId": "cust-0001", "productId": "prod-0001"}'
+  -d '{"customerId": "001", "productId": "001"}'
 ```
 
 Note `amount` is no longer required in the request - Order Service derives
 the authoritative price from Product Service (see edge case #6 below).
 
 ```bash
-curl http://localhost:3001/customers/cust-0001
+curl http://localhost:3001/customers/001
 curl "http://localhost:3002/products?page=1&pageSize=10"
 curl http://localhost:3003/health
 curl http://localhost:3003/metrics

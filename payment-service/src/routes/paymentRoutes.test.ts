@@ -25,9 +25,9 @@ describe('POST /payments', () => {
 
   it('returns 403 without the internal API key', async () => {
     const response = await request(buildApp()).post('/payments').send({
-      customerId: 'cust-0001',
+      customerId: '001',
       orderId: 'order-0001',
-      productId: 'prod-0001',
+      productId: '001',
       amount: 19.99,
     });
 
@@ -39,9 +39,9 @@ describe('POST /payments', () => {
       .post('/payments')
       .set('x-internal-api-key', internalApiKey)
       .send({
-        customerId: 'cust-0001',
+        customerId: '001',
         orderId: 'order-0001',
-        productId: 'prod-0001',
+        productId: '001',
         amount: 19.99,
       });
 
@@ -54,7 +54,7 @@ describe('POST /payments', () => {
     const response = await request(buildApp())
       .post('/payments')
       .set('x-internal-api-key', internalApiKey)
-      .send({ customerId: 'cust-0001' });
+      .send({ customerId: '001' });
 
     expect(response.status).toBe(400);
     expect(response.body.error.code).toBe('VALIDATION_ERROR');

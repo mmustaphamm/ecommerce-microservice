@@ -1,8 +1,8 @@
 import Joi from 'joi';
 
 export const getProductParamsSchema = Joi.object({
-  productId: Joi.string().pattern(/^prod-\d{4}$/).required().messages({
-    'string.pattern.base': 'productId must match format prod-0001',
+  productId: Joi.string().pattern(/^\d{3}$/).required().messages({
+    'string.pattern.base': 'productId must match format 001',
   }),
 });
 

@@ -45,13 +45,13 @@ class FakeOrderRepository implements IOrderRepository {
 }
 
 const fakeCustomer: CustomerInfo = {
-  customerId: 'cust-0001',
+  customerId: '001',
   name: 'John Doe',
   email: 'john.doe@example.com',
 };
 
 const fakeProduct: ProductInfo = {
-  productId: 'prod-0001',
+  productId: '001',
   name: 'Wireless Mouse',
   price: 19.99,
   stock: 10,
@@ -101,14 +101,14 @@ describe('OrderService', () => {
     const { service, orderRepo, productClient } = makeService(paymentClient, publisher);
 
     const result = await service.createOrder({
-      customerId: 'cust-0001',
-      productId: 'prod-0001',
+      customerId: '001',
+      productId: '001',
       amount: 19.99,
     });
 
     expect(result.orderStatus).toBe('confirmed');
     expect(orderRepo.saved[0].paymentInitiated).toBe(true);
-    expect(productClient.reserveStock).toHaveBeenCalledWith('prod-0001', 1, undefined);
+    expect(productClient.reserveStock).toHaveBeenCalledWith('001', 1, undefined);
     expect(publisher.publish).not.toHaveBeenCalled();
   });
 
@@ -121,7 +121,7 @@ describe('OrderService', () => {
 
     // Client tries to lowball the price - server must ignore this and use
     // the real product price (19.99) instead.
-    await service.createOrder({ customerId: 'cust-0001', productId: 'prod-0001', amount: 0.01 });
+    await service.createOrder({ customerId: '001', productId: '001', amount: 0.01 });
 
     expect(orderRepo.saved[0].amount).toBe(19.99);
     expect(paymentClient.initiatePayment).toHaveBeenCalledWith(
@@ -141,8 +141,8 @@ describe('OrderService', () => {
     const { service, orderRepo } = makeService(paymentClient, publisher);
 
     const result = await service.createOrder({
-      customerId: 'cust-0001',
-      productId: 'prod-0001',
+      customerId: '001',
+      productId: '001',
       amount: 19.99,
     });
 
@@ -158,7 +158,7 @@ describe('OrderService', () => {
     // confirms so the retry worker can pick it up later.
     expect(publisher.publish).toHaveBeenCalledTimes(1);
     const [, , payload] = (publisher.publish as jest.Mock).mock.calls[0];
-    expect(payload).toMatchObject({ customerId: 'cust-0001', productId: 'prod-0001', attempts: 1 });
+    expect(payload).toMatchObject({ customerId: '001', productId: '001', attempts: 1 });
   });
 
   it('rejects the order outright with ConflictError when stock is insufficient, without ever saving an order', async () => {
@@ -170,7 +170,7 @@ describe('OrderService', () => {
     });
 
     await expect(
-      service.createOrder({ customerId: 'cust-0001', productId: 'prod-0001', amount: 19.99 }),
+      service.createOrder({ customerId: '001', productId: '001', amount: 19.99 }),
     ).rejects.toThrow(ConflictError);
 
     expect(orderRepo.saved).toHaveLength(0);
@@ -188,10 +188,10 @@ describe('OrderService', () => {
     jest.spyOn(orderRepo, 'create').mockRejectedValueOnce(new Error('db connection reset'));
 
     await expect(
-      service.createOrder({ customerId: 'cust-0001', productId: 'prod-0001', amount: 19.99 }),
+      service.createOrder({ customerId: '001', productId: '001', amount: 19.99 }),
     ).rejects.toThrow('db connection reset');
 
-    expect(releaseStock).toHaveBeenCalledWith('prod-0001', 1, undefined);
+    expect(releaseStock).toHaveBeenCalledWith('001', 1, undefined);
   });
 
   it('replays the existing order on idempotency key match instead of creating a duplicate', async () => {
@@ -202,13 +202,13 @@ describe('OrderService', () => {
     const { service, orderRepo } = makeService(paymentClient, publisher);
 
     const first = await service.createOrder(
-      { customerId: 'cust-0001', productId: 'prod-0001', amount: 19.99 },
+      { customerId: '001', productId: '001', amount: 19.99 },
       undefined,
       'idem-key-123',
     );
 
     const second = await service.createOrder(
-      { customerId: 'cust-0001', productId: 'prod-0001', amount: 19.99 },
+      { customerId: '001', productId: '001', amount: 19.99 },
       undefined,
       'idem-key-123',
     );
@@ -227,8 +227,8 @@ describe('OrderService', () => {
 
     const winningOrder: OrderAttributes = {
       orderId: 'winner-order-id',
-      customerId: 'cust-0001',
-      productId: 'prod-0001',
+      customerId: '001',
+      productId: '001',
       amount: 19.99,
       orderStatus: 'payment_pending',
       paymentInitiated: false,
@@ -248,13 +248,13 @@ describe('OrderService', () => {
     });
 
     const result = await service.createOrder(
-      { customerId: 'cust-0001', productId: 'prod-0001', amount: 19.99 },
+      { customerId: '001', productId: '001', amount: 19.99 },
       undefined,
       'race-key',
     );
 
     expect(result.orderId).toBe('winner-order-id');
-    expect(releaseStock).toHaveBeenCalledWith('prod-0001', 1, undefined);
+    expect(releaseStock).toHaveBeenCalledWith('001', 1, undefined);
   });
 
   it('propagates non-upstream errors from the payment client instead of swallowing them', async () => {
@@ -267,7 +267,7 @@ describe('OrderService', () => {
     const { service } = makeService(paymentClient, publisher);
 
     await expect(
-      service.createOrder({ customerId: 'cust-0001', productId: 'prod-0001', amount: 19.99 }),
+      service.createOrder({ customerId: '001', productId: '001', amount: 19.99 }),
     ).rejects.toThrow('totally unexpected bug');
   });
 
@@ -278,13 +278,13 @@ describe('OrderService', () => {
     const publisher = { publish: jest.fn() } as unknown as Publisher;
     const { service } = makeService(paymentClient, publisher);
 
-    const created = await service.createOrder({ customerId: 'cust-0001', productId: 'prod-0001' });
+    const created = await service.createOrder({ customerId: '001', productId: '001' });
     const status = await service.getOrderStatus(created.orderId);
 
     expect(status).toMatchObject({
       orderId: created.orderId,
-      customerId: 'cust-0001',
-      productId: 'prod-0001',
+      customerId: '001',
+      productId: '001',
       orderStatus: 'confirmed',
       paymentInitiated: true,
     });

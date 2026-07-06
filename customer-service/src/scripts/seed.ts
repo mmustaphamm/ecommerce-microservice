@@ -5,11 +5,23 @@ import { CustomerModel } from '../models/Customer';
 
 const logger = createLogger({ serviceName: 'customer-service:seed' });
 
-export const SEED_CUSTOMER = {
-  customerId: 'cust-0001',
-  name: 'John Doe',
-  email: 'john.doe@example.com',
-};
+export const SEED_CUSTOMERS = [
+  {
+    customerId: '001',
+    name: 'John Doe',
+    email: 'john.doe@example.com',
+  },
+  {
+    customerId: '002',
+    name: 'Jane Smith',
+    email: 'jane.smith@example.com',
+  },
+  {
+    customerId: '003',
+    name: 'Ada Lovelace',
+    email: 'ada.lovelace@example.com',
+  },
+];
 
 /**
  * Idempotent seed: safe to run every time the container starts (upsert on
@@ -19,13 +31,19 @@ export const SEED_CUSTOMER = {
 export async function seed(): Promise<void> {
   await mongoose.connect(env.MONGO_URI);
 
-  await CustomerModel.findOneAndUpdate(
-    { customerId: SEED_CUSTOMER.customerId },
-    { $setOnInsert: SEED_CUSTOMER },
-    { upsert: true, new: true },
+  await CustomerModel.deleteMany({ customerId: { $in: ['cust-0001'] } });
+
+  await Promise.all(
+    SEED_CUSTOMERS.map((customer) =>
+      CustomerModel.findOneAndUpdate(
+        { customerId: customer.customerId },
+        { $setOnInsert: customer },
+        { upsert: true, new: true },
+      ),
+    ),
   );
 
-  logger.info({ customerId: SEED_CUSTOMER.customerId }, 'Seed customer ensured');
+  logger.info({ count: SEED_CUSTOMERS.length }, 'Seed customers ensured');
   await mongoose.disconnect();
 }
 

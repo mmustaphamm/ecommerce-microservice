@@ -24,5 +24,5 @@ export async function connectDatabase(logger: Logger): Promise<void> {
 }
 
 export function isDatabaseConnected(): boolean {
-  return isConnected;
+  return isConnected || mongoose.connection.readyState === 1;
 }

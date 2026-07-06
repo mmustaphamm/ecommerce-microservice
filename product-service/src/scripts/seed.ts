@@ -6,14 +6,17 @@ import { ProductModel } from '../models/Product';
 const logger = createLogger({ serviceName: 'product-service:seed' });
 
 export const SEED_PRODUCTS = [
-  { productId: 'prod-0001', name: 'Wireless Mouse', price: 19.99, stock: 100 },
-  { productId: 'prod-0002', name: 'Mechanical Keyboard', price: 79.99, stock: 50 },
-  { productId: 'prod-0003', name: '27" Monitor', price: 249.99, stock: 30 },
-  { productId: 'prod-0004', name: 'USB-C Hub', price: 34.5, stock: 75 },
+  { productId: '001', name: 'Wireless Mouse', price: 19.99, stock: 100 },
+  { productId: '002', name: 'Mechanical Keyboard', price: 79.99, stock: 50 },
+  { productId: '003', name: '27" Monitor', price: 249.99, stock: 30 },
 ];
 
 export async function seed(): Promise<void> {
   await mongoose.connect(env.MONGO_URI);
+
+  await ProductModel.deleteMany({
+    productId: { $in: ['prod-0001', 'prod-0002', 'prod-0003', 'prod-0004'] },
+  });
 
   await Promise.all(
     SEED_PRODUCTS.map((product) =>

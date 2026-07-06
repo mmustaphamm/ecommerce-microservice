@@ -19,9 +19,9 @@ describe('PaymentService', () => {
   let service: PaymentService;
 
   const request: InitiatePaymentRequest = {
-    customerId: 'cust-0001',
+    customerId: '001',
     orderId: 'order-0001',
-    productId: 'prod-0001',
+    productId: '001',
     amount: 19.99,
   };
 
@@ -43,9 +43,9 @@ describe('PaymentService', () => {
 
     expect(publisher.publishedEvents).toHaveLength(1);
     expect(publisher.publishedEvents[0]).toMatchObject({
-      customerId: 'cust-0001',
+      customerId: '001',
       orderId: 'order-0001',
-      productId: 'prod-0001',
+      productId: '001',
       amount: 19.99,
     });
   });

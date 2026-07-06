@@ -48,7 +48,7 @@ describe('ProductService', () => {
   let service: ProductService;
 
   const sampleProduct: ProductAttributes = {
-    productId: 'prod-0001',
+    productId: '001',
     name: 'Wireless Mouse',
     price: 19.99,
     stock: 5,
@@ -62,7 +62,7 @@ describe('ProductService', () => {
 
   it('returns the product when found', async () => {
     await repo.create(sampleProduct);
-    await expect(service.getProductById('prod-0001')).resolves.toEqual(sampleProduct);
+    await expect(service.getProductById('001')).resolves.toEqual(sampleProduct);
   });
 
   it('throws NotFoundError when the product does not exist', async () => {
@@ -79,13 +79,13 @@ describe('ProductService', () => {
 
   it('reserves stock and decrements it atomically', async () => {
     await repo.create(sampleProduct);
-    const updated = await service.reserveStock('prod-0001', 2);
+    const updated = await service.reserveStock('001', 2);
     expect(updated.stock).toBe(3);
   });
 
   it('throws ConflictError when reserving more stock than available', async () => {
     await repo.create(sampleProduct);
-    await expect(service.reserveStock('prod-0001', 999)).rejects.toThrow(ConflictError);
+    await expect(service.reserveStock('001', 999)).rejects.toThrow(ConflictError);
   });
 
   it('throws NotFoundError when reserving stock for a nonexistent product', async () => {
@@ -94,8 +94,8 @@ describe('ProductService', () => {
 
   it('releases stock back', async () => {
     await repo.create(sampleProduct);
-    await service.reserveStock('prod-0001', 2);
-    const released = await service.releaseStock('prod-0001', 2);
+    await service.reserveStock('001', 2);
+    const released = await service.releaseStock('001', 2);
     expect(released.stock).toBe(5);
   });
 });

@@ -24,16 +24,16 @@ describe('Product routes', () => {
   });
 
   it('GET /products/:productId returns 200 when found', async () => {
-    await ProductModel.create({ productId: 'prod-0001', name: 'Wireless Mouse', price: 19.99, stock: 100 });
+    await ProductModel.create({ productId: '001', name: 'Wireless Mouse', price: 19.99, stock: 100 });
 
-    const response = await request(app).get('/products/prod-0001');
+    const response = await request(app).get('/products/001');
 
     expect(response.status).toBe(200);
     expect(response.body.data.name).toBe('Wireless Mouse');
   });
 
   it('GET /products/:productId returns 404 when not found', async () => {
-    const response = await request(app).get('/products/prod-9999');
+    const response = await request(app).get('/products/999');
     expect(response.status).toBe(404);
   });
 
@@ -43,8 +43,8 @@ describe('Product routes', () => {
   });
 
   it('GET /products returns paginated products', async () => {
-    await ProductModel.create({ productId: 'prod-0001', name: 'Wireless Mouse', price: 19.99, stock: 100 });
-    await ProductModel.create({ productId: 'prod-0002', name: 'Keyboard', price: 79.99, stock: 50 });
+    await ProductModel.create({ productId: '001', name: 'Wireless Mouse', price: 19.99, stock: 100 });
+    await ProductModel.create({ productId: '002', name: 'Keyboard', price: 79.99, stock: 50 });
 
     const response = await request(app).get('/products');
 
@@ -54,20 +54,20 @@ describe('Product routes', () => {
   });
 
   it('PATCH /products/:productId/reserve requires internal auth', async () => {
-    await ProductModel.create({ productId: 'prod-0001', name: 'Wireless Mouse', price: 19.99, stock: 10 });
+    await ProductModel.create({ productId: '001', name: 'Wireless Mouse', price: 19.99, stock: 10 });
 
     const response = await request(app)
-      .patch('/products/prod-0001/reserve')
+      .patch('/products/001/reserve')
       .send({ quantity: 1 });
 
     expect(response.status).toBe(403);
   });
 
   it('PATCH /products/:productId/reserve decrements stock with valid internal auth', async () => {
-    await ProductModel.create({ productId: 'prod-0001', name: 'Wireless Mouse', price: 19.99, stock: 10 });
+    await ProductModel.create({ productId: '001', name: 'Wireless Mouse', price: 19.99, stock: 10 });
 
     const response = await request(app)
-      .patch('/products/prod-0001/reserve')
+      .patch('/products/001/reserve')
       .set('x-internal-api-key', process.env.INTERNAL_API_KEY as string)
       .send({ quantity: 1 });
 
@@ -76,10 +76,10 @@ describe('Product routes', () => {
   });
 
   it('PATCH /products/:productId/reserve returns 409 when stock is insufficient', async () => {
-    await ProductModel.create({ productId: 'prod-0001', name: 'Wireless Mouse', price: 19.99, stock: 1 });
+    await ProductModel.create({ productId: '001', name: 'Wireless Mouse', price: 19.99, stock: 1 });
 
     const response = await request(app)
-      .patch('/products/prod-0001/reserve')
+      .patch('/products/001/reserve')
       .set('x-internal-api-key', process.env.INTERNAL_API_KEY as string)
       .send({ quantity: 5 });
 

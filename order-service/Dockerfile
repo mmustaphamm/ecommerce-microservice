@@ -20,6 +20,7 @@ ENV NODE_ENV=production
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/shared/dist ./shared/dist
+COPY --from=builder /app/shared/dist ./shared/src
 COPY --from=builder /app/shared/package.json ./shared/package.json
 COPY --from=builder /app/order-service/dist ./order-service/dist
 COPY --from=builder /app/order-service/package.json ./order-service/package.json
