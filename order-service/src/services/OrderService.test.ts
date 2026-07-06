@@ -12,13 +12,6 @@ import {
   OrderStatus,
 } from '@ecommerce/shared/src';
 
-/**
- * Fake repository that mimics the real Mongo implementation closely enough
- * to test idempotency and the save-then-update flow: a unique index on
- * idempotencyKey (rejecting a second insert with the same key, mirroring
- * MongoDB's E11000 duplicate-key error) and a separate updatePaymentStatus
- * step distinct from create.
- */
 class FakeOrderRepository implements IOrderRepository {
   public saved: OrderAttributes[] = [];
 

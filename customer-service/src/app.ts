@@ -9,10 +9,6 @@ import {
 } from '@ecommerce/shared/src';
 import { createRoutes } from './routes';
 
-/**
- * Express app setup. Feature wiring and route registration live outside this
- * file so the app entry point only owns cross-cutting HTTP concerns.
- */
 export function createApp(logger: Logger): Express {
   const app = express();
   app.use(helmet());

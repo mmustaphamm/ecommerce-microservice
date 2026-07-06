@@ -4,15 +4,6 @@ import { ConfirmChannel } from 'amqplib';
 import client from 'prom-client';
 import { TOPOLOGY } from '@ecommerce/shared';
 
-/**
- * Workers have no natural HTTP surface, but "no visibility into a worker
- * that only talks to a queue" is exactly how dead letters go unnoticed in
- * production. This gives us:
- *  - GET /health: is this process actually connected to its dependencies?
- *  - GET /metrics: a Prometheus gauge for DLQ depth, so an alert can fire
- *    the moment messages start piling up in transaction-history-dlq,
- *    instead of someone discovering it weeks later.
- */
 export function createMonitoringServer(
   channel: ConfirmChannel,
   isReady: () => boolean,

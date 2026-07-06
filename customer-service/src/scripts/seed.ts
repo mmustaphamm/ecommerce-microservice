@@ -5,7 +5,6 @@ import { CustomerModel } from '../models/Customer';
 
 const logger = createLogger({ serviceName: 'customer-service:seed' });
 
-/** The single demo customer used throughout the whole order flow demo. */
 export const SEED_CUSTOMER = {
   customerId: 'cust-0001',
   name: 'John Doe',

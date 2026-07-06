@@ -7,18 +7,7 @@ export interface OrderAttributes {
   productId: string;
   amount: number;
   orderStatus: OrderStatus;
-  /**
-   * Tracks whether the synchronous call to Payment Service succeeded. When
-   * false, the order was still persisted (per our resilience design) and a
-   * `payment.retry.requested` event was published for later reconciliation.
-   */
   paymentInitiated: boolean;
-  /**
-   * Client-supplied idempotency key (from the `Idempotency-Key` header).
-   * If a request with the same key arrives again (e.g. a client retry after
-   * a network timeout), we return the existing order instead of creating a
-   * duplicate. Optional + sparse-indexed since not every caller sends one.
-   */
   idempotencyKey?: string;
   createdAt: Date;
 }

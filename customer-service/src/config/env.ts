@@ -16,11 +16,6 @@ const schema = Joi.object({
   LOG_LEVEL: Joi.string().default('info'),
 }).unknown(true);
 
-/**
- * Validates process.env at startup and exits fast with a clear message if
- * required config is missing, rather than letting the service boot into a
- * broken state and fail confusingly later (e.g. on the first DB call).
- */
 function loadEnv(): Env {
   const { error, value } = schema.validate(process.env);
   if (error) {

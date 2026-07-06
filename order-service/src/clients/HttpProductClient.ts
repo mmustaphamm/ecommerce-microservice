@@ -25,11 +25,6 @@ export class HttpProductClient implements IProductClient {
         correlationId,
       );
     } catch (err) {
-      // Distinguish "product service told us there's no stock" (a legitimate
-      // business rejection - should fail the order outright) from "product
-      // service is unreachable" (an infra failure - different handling).
-      // The shared HttpClient collapses all 4xx into UpstreamServiceError,
-      // so we unwrap the original downstream error code from `details`.
       if (err instanceof UpstreamServiceError) {
         const details = err.details as ErrorResponseBody | undefined;
         if (details?.error?.code === 'CONFLICT') {

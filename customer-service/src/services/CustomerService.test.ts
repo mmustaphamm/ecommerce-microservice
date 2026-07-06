@@ -3,12 +3,6 @@ import { ICustomerRepository } from '../repositories/ICustomerRepository';
 import { CustomerAttributes } from '../models/Customer';
 import { NotFoundError } from '@ecommerce/shared/src';
 
-/**
- * Because CustomerService depends on the ICustomerRepository interface
- * (Dependency Inversion), we can substitute this in-memory fake instead of
- * a real MongoDB connection - the test runs instantly and has zero
- * infrastructure dependencies.
- */
 class FakeCustomerRepository implements ICustomerRepository {
   private customers = new Map<string, CustomerAttributes>();
 

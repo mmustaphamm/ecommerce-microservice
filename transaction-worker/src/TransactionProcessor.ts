@@ -2,12 +2,6 @@ import type { Logger } from 'pino';
 import { TransactionCreatedEvent } from '@ecommerce/shared';
 import { ITransactionRepository } from './repositories/ITransactionRepository';
 
-/**
- * Handles a single `TransactionCreatedEvent`. Kept separate from the
- * RabbitMQ `Consumer` wiring (see worker.ts) so this logic can be unit
- * tested with a fake repository and a plain in-memory event object - no
- * broker connection needed.
- */
 export class TransactionProcessor {
   constructor(
     private readonly transactionRepo: ITransactionRepository,

@@ -16,15 +16,6 @@ import { createMonitoringServer } from './monitoring';
 
 const logger = createLogger({ serviceName: 'transaction-worker', level: env.LOG_LEVEL });
 
-/**
- * This worker has no REST business logic - it has no HTTP surface for
- * actual functionality. It's a standalone long-running process whose only
- * job is consuming from the transaction-history-queue and persisting each
- * event. This mirrors how queue consumers are typically deployed in real
- * systems: as their own process/container, scaled independently from any
- * REST service. It DOES expose a minimal /health and /metrics endpoint
- * (see monitoring.ts) purely for operational visibility.
- */
 async function bootstrap(): Promise<void> {
   await connectDatabase(logger);
 

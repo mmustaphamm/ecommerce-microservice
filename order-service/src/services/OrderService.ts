@@ -16,43 +16,10 @@ import { IProductClient } from '../clients/IProductClient';
 import { ICustomerClient } from '../clients/ICustomerClient';
 import { OrderAttributes } from '../models/Order';
 
-/** Every order in this demo is for a single unit of a single product. */
 const ORDER_QUANTITY = 1;
 
-/** Mongo's duplicate-key error code, used to detect a race on idempotencyKey. */
 const MONGO_DUPLICATE_KEY_CODE = 11000;
 
-/**
- * Orchestrates order creation across the customer, product, and payment
- * services. This is the busiest class in the system, so it's worth being
- * explicit about the flow and *why* each failure is handled differently:
- *
- *  - Customer/Product not found, or insufficient stock -> these are genuine
- *    bad requests / business rejections, so we let them fail outright with
- *    a 4xx (404 or 409). No order is created, no stock is touched.
- *
- *  - Payment Service unreachable (after the shared HttpClient's built-in
- *    retries AND circuit breaker are exhausted) -> this is an
- *    *infrastructure* failure, not a bad request. We do NOT fail the
- *    customer's order for this. The order (already durably saved as
- *    `payment_pending` BEFORE we attempted payment - see below) stays in
- *    that state with
- *    `paymentInitiated: false`, and a `payment.retry.requested` event is
- *    published for the retry worker to reconcile later.
- *
- * Ordering of operations matters here and fixes a real consistency bug from
- * the first version of this service: previously we called Payment Service
- * BEFORE saving the order, which meant a payment could succeed while the
- * order was never persisted (e.g. a DB blip right after payment). Now we:
- *   1. validate customer + product exist
- *   2. atomically reserve stock (fails outright, cleanly, if insufficient)
- *   3. save the order as `stock_reserved` FIRST
- *   4. move it to `payment_pending`
- *   5. only then attempt payment
- *   6. update the already-saved order's payment fields based on the outcome
- * This guarantees an order record exists before money ever moves, and a
- * step-4/5 failure never leaves a "phantom" payment with no order behind it.
- */
 export class OrderService {
   constructor(
     private readonly orderRepo: IOrderRepository,

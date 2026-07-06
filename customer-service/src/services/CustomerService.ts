@@ -2,11 +2,6 @@ import { ICustomerRepository } from '../repositories/ICustomerRepository';
 import { CustomerAttributes } from '../models/Customer';
 import { NotFoundError } from '@ecommerce/shared/src';
 
-/**
- * Business logic for customers. Depends on the repository interface only
- * (constructor injection), so it can be unit tested with a fake repository
- * and has no knowledge of Mongoose or HTTP concerns.
- */
 export class CustomerService {
   constructor(private readonly customerRepo: ICustomerRepository) {}
 

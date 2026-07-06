@@ -1,11 +1,6 @@
 import { ICustomerRepository } from './ICustomerRepository';
 import { CustomerModel, CustomerAttributes } from '../models/Customer';
 
-/**
- * Mongoose-backed implementation of `ICustomerRepository`. All Mongoose-
- * specific concerns (lean(), document-to-plain-object mapping) are contained
- * here so the rest of the codebase never imports Mongoose types directly.
- */
 export class MongoCustomerRepository implements ICustomerRepository {
   async findByCustomerId(customerId: string): Promise<CustomerAttributes | null> {
     const doc = await CustomerModel.findOne({ customerId }).lean().exec();

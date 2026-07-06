@@ -3,8 +3,6 @@ import Joi from 'joi';
 export const createOrderSchema = Joi.object({
   customerId: Joi.string().required(),
   productId: Joi.string().required(),
-  // Optional and NOT trusted as the charge amount - see OrderService for
-  // why the authoritative price always comes from Product Service.
   amount: Joi.number().positive().optional(),
 });
 

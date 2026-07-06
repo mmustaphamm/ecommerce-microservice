@@ -10,14 +10,6 @@ import {
 } from '@ecommerce/shared/src';
 import { createRoutes } from './routes';
 
-/**
- * Composition root. `publisher` is injected rather than constructed here
- * because it depends on an already-open RabbitMQ channel, which is
- * established asynchronously during bootstrap (see server.ts) before the
- * Express app is created. `isRabbitMQReady` likewise comes from the
- * RabbitMQConnection created in server.ts, so /health can reflect BOTH
- * MongoDB and RabbitMQ connectivity, not just the database.
- */
 export function createApp(
   logger: Logger,
   publisher: Publisher,

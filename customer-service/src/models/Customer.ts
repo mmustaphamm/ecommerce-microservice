@@ -1,6 +1,5 @@
 import { Schema, model, Document } from 'mongoose';
 
-/** Domain shape of a customer, independent of Mongoose - used across layers. */
 export interface CustomerAttributes {
   customerId: string;
   name: string;

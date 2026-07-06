@@ -17,15 +17,6 @@ import { createMonitoringServer } from './monitoring';
 
 const logger = createLogger({ serviceName: 'payment-retry-worker', level: env.LOG_LEVEL });
 
-/**
- * Standalone consumer, no HTTP business logic - same reasoning as
- * transaction-worker. This process's only job is closing the loop on the
- * "payment service was down" resilience path: consume payment-retry-queue,
- * retry payment initiation with bounded delayed retries, and reconcile the
- * order's final state via Order Service once resolved (either way). It
- * exposes a minimal /health and /metrics endpoint purely for operational
- * visibility into the terminal DLQ depth (see monitoring.ts).
- */
 async function bootstrap(): Promise<void> {
   const rabbitConnection = new RabbitMQConnection({ url: env.RABBITMQ_URL, logger });
   const channel = await rabbitConnection.connect();

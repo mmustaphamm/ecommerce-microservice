@@ -8,27 +8,6 @@ import {
 import { IPaymentClient } from './clients/IPaymentClient';
 import { IOrderClient } from './clients/IOrderClient';
 
-/**
- * This is the fix for "Payment retry queue exists, but no retry worker
- * consumes it" - the single biggest gap flagged in review. Order Service
- * publishes here when Payment Service is down; this worker is what
- * actually closes the loop.
- *
- * On each attempt:
- *  - SUCCESS -> tell Order Service the order is `confirmed`. Done.
- *  - FAILURE, attempts remain -> republish to the delay queue with
- *    attempts+1. RabbitMQ holds it there for a fixed TTL, then
- *    automatically dead-letters it back into the main retry queue - this
- *    is the "TTL + DLX bounce" pattern for delayed retries, since core
- *    RabbitMQ has no native delay/schedule feature without a plugin.
- *  - FAILURE, attempts exhausted -> tell Order Service the order is
- *    permanently `failed`, then re-throw so the Consumer nacks the message
- *    to the terminal DLQ as a durable record for a human/alerting system.
- *
- * A genuinely unexpected error (not an UpstreamServiceError - e.g. a bug)
- * is re-thrown immediately without consuming an attempt or touching order
- * state, since we can't safely reason about what happened.
- */
 export class PaymentRetryProcessor {
   constructor(
     private readonly paymentClient: IPaymentClient,
@@ -94,9 +73,6 @@ export class PaymentRetryProcessor {
         );
       }
 
-      // Re-throw so the Consumer nacks this message to the terminal DLQ -
-      // a durable, inspectable record that this order's payment ultimately
-      // failed, for alerting/manual follow-up.
       throw err;
     }
   }

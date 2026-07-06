@@ -3,11 +3,6 @@ import { CustomerService } from '../services/CustomerService';
 import { CustomerAttributes } from '../models/Customer';
 import { ApiSuccessResponse } from '@ecommerce/shared/src';
 
-/**
- * Controllers only handle HTTP concerns: parsing the request, calling the
- * service layer, and shaping the response. No business logic or DB access
- * lives here (Single Responsibility).
- */
 export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
 

@@ -1,7 +1,3 @@
-# Multi-stage build. Build context MUST be the repo root (see docker-compose.yml
-# "context: ." + "dockerfile: order-service/Dockerfile"), because this
-# service depends on the @ecommerce/shared workspace package alongside it.
-
 FROM node:20-alpine AS builder
 WORKDIR /app
 
