@@ -1,21 +1,7 @@
 import { ConfirmChannel } from 'amqplib';
 import type { Logger } from 'pino';
 
-/**
- * Publishes JSON messages to a direct exchange with a given routing key,
- * using RabbitMQ's publisher confirms.
- *
- * Why this matters: the plain `channel.publish()` boolean return value only
- * reflects local write-buffer pressure in the client library - it does NOT
- * mean the broker received or persisted the message. For financial events
- * (payments, transaction history), that distinction is the difference
- * between "we think we sent it" and "the broker has durably accepted it".
- *
- * A `ConfirmChannel` (see RabbitMQConnection) lets us `await` an explicit
- * ack/nack from the broker per message via a callback, which this class
- * wraps in a Promise so callers can simply `await publisher.publish(...)`
- * and know the broker confirmed receipt before proceeding.
- */
+
 export class Publisher {
   constructor(
     private readonly channel: ConfirmChannel,
@@ -60,12 +46,6 @@ export class Publisher {
     });
   }
 
-  /**
-   * Publishes directly to a named queue (bypassing an exchange), used for
-   * the payment-retry delay-queue bounce pattern where there's no routing
-   * decision to make - we're placing the message straight into a specific
-   * holding queue.
-   */
   sendToQueue(queue: string, payload: unknown, correlationId?: string): Promise<boolean> {
     const buffer = Buffer.from(JSON.stringify(payload));
 

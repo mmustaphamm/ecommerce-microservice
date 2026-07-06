@@ -1,14 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import client from 'prom-client';
 
-/**
- * Minimal Prometheus instrumentation: a request counter (by route/status)
- * and default Node.js process metrics (memory, event loop lag, GC). This is
- * deliberately basic - a production system would add histograms for
- * latency percentiles and business-specific counters (orders created,
- * payments failed, etc.) - but it demonstrates the pattern and gives a
- * real /metrics endpoint that Prometheus could scrape today.
- */
 export function createMetrics(serviceName: string) {
   const register = new client.Registry();
   register.setDefaultLabels({ service: serviceName });

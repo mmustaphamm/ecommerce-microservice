@@ -12,15 +12,6 @@ export interface ErrorResponseBody {
   correlationId?: string;
 }
 
-/**
- * Centralized Express error-handling middleware.
- *
- * Every controller simply calls `next(err)` on failure. This single place
- * decides how errors map to HTTP responses, so we never repeat
- * try/catch-and-format boilerplate in every route handler.
- *
- * Must be registered LAST, after all routes, per Express conventions.
- */
 export function createErrorHandler(logger: Logger) {
   return function errorHandler(
     err: Error,

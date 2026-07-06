@@ -3,16 +3,6 @@ import type { Logger } from 'pino';
 
 export type MessageHandler<T> = (payload: T, raw: ConsumeMessage) => Promise<void>;
 
-/**
- * Consumes messages from a queue with manual acknowledgment.
- *
- * On handler success -> ack (message removed from queue).
- * On handler failure -> nack WITHOUT requeue, which routes the message to
- * the queue's configured dead-letter-exchange (see topology.ts). This is
- * what gives us a working DLQ: we don't need retry-count bookkeeping here
- * because a single failure is enough to dead-letter, keeping the demo
- * simple while still demonstrating the pattern end-to-end.
- */
 export class Consumer {
   constructor(
     private readonly channel: Channel,

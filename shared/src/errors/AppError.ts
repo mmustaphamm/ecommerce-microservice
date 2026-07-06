@@ -1,12 +1,4 @@
-/**
- * Base class for all operational errors thrown intentionally by our services.
- *
- * "Operational" errors are expected failure modes (bad input, missing resource,
- * downstream service unavailable) as opposed to programmer bugs. Keeping them
- * as a distinct class hierarchy lets a single Express error-handling middleware
- * translate them into consistent HTTP responses across every service, instead
- * of each controller hand-rolling try/catch + status-code logic.
- */
+
 export class AppError extends Error {
   public readonly statusCode: number;
   public readonly code: string;

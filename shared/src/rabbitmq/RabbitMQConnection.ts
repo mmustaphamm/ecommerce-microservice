@@ -8,13 +8,6 @@ export interface RabbitMQConnectionOptions {
   connectMaxAttempts?: number;
 }
 
-/**
- * Owns a single amqplib connection + channel, with basic auto-reconnect.
- *
- * Both the Payment Service (publisher) and Transaction Worker (consumer)
- * depend on this rather than talking to amqplib directly, so connection
- * lifecycle/reconnect logic is written once instead of duplicated.
- */
 export class RabbitMQConnection {
   private connection: ChannelModel | null = null;
   private channel: ConfirmChannel | null = null;

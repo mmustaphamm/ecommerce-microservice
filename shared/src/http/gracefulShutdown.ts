@@ -8,19 +8,6 @@ export interface ShutdownDependencies {
   timeoutMs?: number;
 }
 
-/**
- * Registers SIGTERM/SIGINT handlers that:
- *  1. Stop accepting new HTTP connections and let in-flight requests finish
- *  2. Run any additional cleanup (closing Mongo/RabbitMQ connections)
- *  3. Force-exit if cleanup takes too long, so orchestrators (Docker,
- *     Kubernetes) aren't left waiting indefinitely during a rolling deploy
- *     or scale-down.
- *
- * Without this, a container receiving SIGTERM (e.g. during `docker compose
- * down` or a k8s pod eviction) gets killed immediately by the default
- * Node.js behavior, potentially cutting off in-flight requests and leaving
- * DB/broker connections in a dirty state.
- */
 export function registerGracefulShutdown(deps: ShutdownDependencies): void {
   const { httpServer, onShutdown, logger, timeoutMs = 10_000 } = deps;
   let shuttingDown = false;

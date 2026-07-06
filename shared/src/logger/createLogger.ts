@@ -5,11 +5,6 @@ export interface LoggerOptions {
   level?: string;
 }
 
-/**
- * Creates a pino logger tagged with the owning service's name, so logs from
- * every service can be aggregated and filtered consistently (e.g. in
- * `docker-compose logs` or a real log aggregator later).
- */
 export function createLogger({ serviceName, level }: LoggerOptions): Logger {
   const isProduction = process.env.NODE_ENV === 'production';
   const resolvedLevel = level ?? process.env.LOG_LEVEL ?? 'info';
